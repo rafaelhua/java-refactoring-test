@@ -32,14 +32,14 @@ Prerequisites
 Instructions
 ------------
 
-1. Clone this repo from Github to your local machine (or fork the repository if you prefer).
+1. Clone this repo from Github to your local machine.
 2. At the project root directory, run the following command from the command-line:
    `$ ./gradlew build`
 3. The tests run will fail, as some of the tests are not implemented correctly. Part of the task is to fix these tests.
 4. Now perform the refactoring you deem necessary by using your knowledge of Java/Spring best practices. Remember that this includes both code and tests. Also, please feel free to innovate!
 5. Please make sure that your code compiles and that all tests are green when you are done.
-6. When you are finished please commit your code on your local machine and then [create a patch using git](http://git-scm.com/docs/git-format-patch) (if you have not created a fork). 
-7. The final step is to send an email to your contact at SAP to inform this person that you have completed the test. Please make sure to attach a copy of the patch containing your changes (if one was created), or if you have created a fork, please supply the URL to your forked repository.!
+6. When you are finished please commit your code on your local machine and then [create a patch using git](http://git-scm.com/docs/git-format-patch).
+7. The final step is to send an email to your contact at SAP to inform this person that you have completed the test. Please make sure to attach a copy of the patch containing your changes. If you have simply created your own repository as a clone, then please forward the URL.
 
 Business Requirements
 ---------------------
