@@ -1,4 +1,4 @@
-package com.sap.refactoring.web.controller;
+package com.sap.refactoring.user.controller;
 
 import java.util.List;
 
@@ -8,15 +8,23 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.sap.refactoring.user.service.UserService;
+import com.sap.refactoring.user.service.UserServiceImpl;
+
 @Controller
 @RequestMapping("/users")
 public class UserController
 {
-	private final com.sap.refactoring.user.controller.UserController delegate;
+	private final UserService userService;
 
 	public UserController()
 	{
-		this.delegate = new com.sap.refactoring.user.controller.UserController();
+		this(new UserServiceImpl());
+	}
+
+	public UserController(UserService userService)
+	{
+		this.userService = userService;
 	}
 
 	@GetMapping("add/")
@@ -24,7 +32,7 @@ public class UserController
 	                              @RequestParam("email") String email,
 	                              @RequestParam("role") List<String> roles)
 	{
-		return delegate.addUser(name, email, roles);
+		return ResponseEntity.ok(userService.createUser(name, email, roles));
 	}
 
 	@GetMapping("update/")
@@ -32,7 +40,7 @@ public class UserController
 	                                 @RequestParam("email") String email,
 	                                 @RequestParam("role") List<String> roles)
 	{
-		return delegate.updateUser(name, email, roles);
+		return ResponseEntity.ok(userService.updateUser(name, email, roles));
 	}
 
 	@GetMapping("delete/")
@@ -40,18 +48,19 @@ public class UserController
 	                                 @RequestParam("email") String email,
 	                                 @RequestParam("role") List<String> roles)
 	{
-		return delegate.deleteUser(name, email, roles);
+		userService.deleteUser(name);
+		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping("find/")
 	public ResponseEntity getUsers()
 	{
-		return delegate.getUsers();
+		return ResponseEntity.ok(userService.getUsers());
 	}
 
 	@GetMapping("search/")
 	public ResponseEntity findUser(@RequestParam("name") String name)
 	{
-		return delegate.findUser(name);
+		return ResponseEntity.ok(userService.findUser(name));
 	}
 }
