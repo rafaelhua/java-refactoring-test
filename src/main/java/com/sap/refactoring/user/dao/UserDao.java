@@ -4,8 +4,7 @@ import java.util.List;
 
 import com.sap.refactoring.user.model.User;
 
-public interface UserDao
-{
+public interface UserDao {
 	void saveUser(User user);
 
 	List<User> getUsers();

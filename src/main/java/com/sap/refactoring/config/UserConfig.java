@@ -9,17 +9,14 @@ import com.sap.refactoring.user.service.UserService;
 import com.sap.refactoring.user.service.UserServiceImpl;
 
 @Configuration
-public class UserConfig
-{
+public class UserConfig {
 	@Bean
-	public UserDao userDao()
-	{
+	public UserDao userDao() {
 		return new UserDaoImpl();
 	}
 
 	@Bean
-	public UserService userService(UserDao userDao)
-	{
+	public UserService userService(UserDao userDao) {
 		return new UserServiceImpl(userDao);
 	}
 }

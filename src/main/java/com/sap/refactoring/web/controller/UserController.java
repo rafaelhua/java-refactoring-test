@@ -10,48 +10,44 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/users")
-public class UserController
-{
+public class UserController {
 	private final com.sap.refactoring.user.controller.UserController delegate;
 
-	public UserController()
-	{
+	public UserController() {
 		this.delegate = new com.sap.refactoring.user.controller.UserController();
 	}
 
 	@GetMapping("add/")
-	public ResponseEntity addUser(@RequestParam("name") String name,
-	                              @RequestParam("email") String email,
-	                              @RequestParam("role") List<String> roles)
-	{
+	public ResponseEntity addUser(
+			@RequestParam("name") String name,
+			@RequestParam("email") String email,
+			@RequestParam("role") List<String> roles) {
 		return delegate.addUser(name, email, roles);
 	}
 
 	@GetMapping("update/")
-	public ResponseEntity updateUser(@RequestParam("name") String name,
-	                                 @RequestParam("email") String email,
-	                                 @RequestParam("role") List<String> roles)
-	{
+	public ResponseEntity updateUser(
+			@RequestParam("name") String name,
+			@RequestParam("email") String email,
+			@RequestParam("role") List<String> roles) {
 		return delegate.updateUser(name, email, roles);
 	}
 
 	@GetMapping("delete/")
-	public ResponseEntity deleteUser(@RequestParam("name") String name,
-	                                 @RequestParam("email") String email,
-	                                 @RequestParam("role") List<String> roles)
-	{
+	public ResponseEntity deleteUser(
+			@RequestParam("name") String name,
+			@RequestParam("email") String email,
+			@RequestParam("role") List<String> roles) {
 		return delegate.deleteUser(name, email, roles);
 	}
 
 	@GetMapping("find/")
-	public ResponseEntity getUsers()
-	{
+	public ResponseEntity getUsers() {
 		return delegate.getUsers();
 	}
 
 	@GetMapping("search/")
-	public ResponseEntity findUser(@RequestParam("name") String name)
-	{
+	public ResponseEntity findUser(@RequestParam("name") String name) {
 		return delegate.findUser(name);
 	}
 }
