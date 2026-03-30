@@ -10,16 +10,12 @@ public class UserDaoImpl implements UserDao {
 
 	@Override
 	public void saveUser(User user) {
-		users.add(copyUser(user));
+		users.add(user);
 	}
 
 	@Override
 	public List<User> getUsers() {
-		List<User> userCopies = new ArrayList<>();
-		for (User user : users) {
-			userCopies.add(copyUser(user));
-		}
-		return userCopies;
+		return users;
 	}
 
 	@Override
@@ -42,10 +38,10 @@ public class UserDaoImpl implements UserDao {
 			return;
 		}
 
-		for (int i = 0; i < users.size(); i++) {
-			User existingUser = users.get(i);
+		for (User existingUser : users) {
 			if (userToUpdate.getName().equals(existingUser.getName())) {
-				users.set(i, copyUser(userToUpdate));
+				existingUser.setEmail(userToUpdate.getEmail());
+				existingUser.setRoles(userToUpdate.getRoles());
 				return;
 			}
 		}
@@ -59,17 +55,10 @@ public class UserDaoImpl implements UserDao {
 
 		for (User user : users) {
 			if (name.equals(user.getName())) {
-				return copyUser(user);
+				return user;
 			}
 		}
 
 		return null;
-	}
-
-	private User copyUser(User user) {
-		if (user == null) {
-			return null;
-		}
-		return new User(user.getName(), user.getEmail(), user.getRoles());
 	}
 }

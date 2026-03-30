@@ -1,12 +1,14 @@
 package com.sap.refactoring.user.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.sap.refactoring.user.dao.UserDao;
 import com.sap.refactoring.user.dao.UserDaoImpl;
+import com.sap.refactoring.user.exception.DuplicateEmailException;
+import com.sap.refactoring.user.exception.ErrorMessages;
+import com.sap.refactoring.user.exception.UserNotFoundException;
 import com.sap.refactoring.user.model.User;
 
 @Service
@@ -26,7 +28,7 @@ public class UserServiceImpl implements UserService {
 		validateUserInput(name, email, roles);
 
 		if (emailExists(email)) {
-			throw new IllegalStateException("A user with this email already exists");
+			throw new DuplicateEmailException(ErrorMessages.DUPLICATE_EMAIL);
 		}
 
 		User user = buildUser(name, email, roles);
@@ -37,75 +39,66 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User updateUser(String name, String email, List<String> roles) {
 		validateUserInput(name, email, roles);
+		findExistingUser(name);
 
-		User existingUser = userDao.findUser(name);
-		if (existingUser == null) {
-			throw new IllegalArgumentException("User not found");
+		if (emailAssignedToAnotherUser(name, email)) {
+			throw new DuplicateEmailException(ErrorMessages.DUPLICATE_EMAIL);
 		}
 
 		User userToUpdate = buildUser(name, email, roles);
-		if (emailAssignedToAnotherUser(name, email)) {
-			throw new IllegalStateException("A user with this email already exists");
-		}
-
 		userDao.updateUser(userToUpdate);
 		return userToUpdate;
 	}
 
 	@Override
 	public void deleteUser(String name) {
-		if (name == null || name.isBlank()) {
-			throw new IllegalArgumentException("Name must not be blank");
-		}
-
-		User existingUser = userDao.findUser(name);
-		if (existingUser == null) {
-			throw new IllegalArgumentException("User not found");
-		}
-
+		User existingUser = findExistingUser(name);
 		userDao.deleteUser(existingUser);
 	}
 
 	@Override
 	public List<User> getUsers() {
-		List<User> users = userDao.getUsers();
-		if (users == null) {
-			return new ArrayList<>();
-		}
-		return users;
+		return userDao.getUsers();
 	}
 
 	@Override
 	public User findUser(String name) {
-		if (name == null || name.isBlank()) {
-			throw new IllegalArgumentException("Name must not be blank");
-		}
-		return userDao.findUser(name);
+		return findExistingUser(name);
 	}
 
 	private User buildUser(String name, String email, List<String> roles) {
-		User user = new User();
-		user.setName(name);
-		user.setEmail(email);
-		user.setRoles(new ArrayList<>(roles));
-		return user;
+		return new User(name, email, roles);
 	}
 
 	private void validateUserInput(String name, String email, List<String> roles) {
-		if (name == null || name.isBlank()) {
-			throw new IllegalArgumentException("Name must not be blank");
-		}
+		validateName(name);
 		if (email == null || email.isBlank()) {
-			throw new IllegalArgumentException("Email must not be blank");
+			throw new IllegalArgumentException(ErrorMessages.EMAIL_REQUIRED);
 		}
 		if (roles == null || roles.isEmpty()) {
-			throw new IllegalArgumentException("User must have at least one role");
+			throw new IllegalArgumentException(ErrorMessages.ROLE_REQUIRED);
+		}
+	}
+
+	private User findExistingUser(String name) {
+		validateName(name);
+
+		User existingUser = userDao.findUser(name);
+		if (existingUser == null) {
+			throw new UserNotFoundException(ErrorMessages.USER_NOT_FOUND);
+		}
+
+		return existingUser;
+	}
+
+	private void validateName(String name) {
+		if (name == null || name.isBlank()) {
+			throw new IllegalArgumentException(ErrorMessages.NAME_REQUIRED);
 		}
 	}
 
 	private boolean emailExists(String email) {
-		List<User> users = getUsers();
-		for (User user : users) {
+		for (User user : getUsers()) {
 			if (email.equals(user.getEmail())) {
 				return true;
 			}
@@ -114,8 +107,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	private boolean emailAssignedToAnotherUser(String name, String email) {
-		List<User> users = getUsers();
-		for (User user : users) {
+		for (User user : getUsers()) {
 			if (email.equals(user.getEmail()) && !name.equals(user.getName())) {
 				return true;
 			}
