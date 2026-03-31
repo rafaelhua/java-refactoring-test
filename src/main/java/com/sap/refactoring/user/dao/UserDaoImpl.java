@@ -17,9 +17,9 @@ public class UserDaoImpl implements UserDao {
 	private final Map<String, User> users = new HashMap<>();
 
 	@Override
-	public synchronized void saveUser(User user) {
+	public synchronized User saveUser(User user) {
 		if (user == null || !StringUtils.hasText(user.getEmail())) {
-			return;
+			return null;
 		}
 
 		if (users.containsKey(user.getEmail())) {
@@ -27,6 +27,7 @@ public class UserDaoImpl implements UserDao {
 		}
 
 		users.put(user.getEmail(), user);
+		return user;
 	}
 
 	@Override
@@ -44,25 +45,20 @@ public class UserDaoImpl implements UserDao {
 	}
 
 	@Override
-	public synchronized void updateUser(String currentEmail, User userToUpdate) {
-		if (!StringUtils.hasText(currentEmail)
+	public synchronized void updateUser(String email, User userToUpdate) {
+		if (!StringUtils.hasText(email)
 				|| userToUpdate == null
-				|| !StringUtils.hasText(userToUpdate.getEmail())) {
+				|| !StringUtils.hasText(userToUpdate.getName())) {
 			return;
 		}
 
-		User existingUser = users.get(currentEmail);
+		User existingUser = users.get(email);
 		if (existingUser == null) {
 			return;
 		}
 
-		String updatedEmail = userToUpdate.getEmail();
-		if (!currentEmail.equals(updatedEmail) && users.containsKey(updatedEmail)) {
-			throw new DuplicateEmailException(ErrorMessages.DUPLICATE_EMAIL);
-		}
-
-		users.remove(currentEmail);
-		users.put(updatedEmail, userToUpdate);
+		userToUpdate.setEmail(existingUser.getEmail());
+		users.put(email, userToUpdate);
 	}
 
 	@Override

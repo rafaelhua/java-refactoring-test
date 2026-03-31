@@ -23,17 +23,16 @@ public class UserServiceImpl implements UserService {
 		validateUserInput(name, email, roles);
 
 		User user = buildUser(name, email, roles);
-		userDao.saveUser(user);
-		return user;
+		return userDao.saveUser(user);
 	}
 
 	@Override
-	public User updateUser(String currentEmail, String name, String email, List<String> roles) {
-		validateUserInput(name, email, roles);
-		findExistingUser(currentEmail);
+	public User updateUser(String email, String name, List<String> roles) {
+		User existingUser = findExistingUser(email);
+		validateUpdateInput(name, roles);
 
-		User userToUpdate = buildUser(name, email, roles);
-		userDao.updateUser(currentEmail, userToUpdate);
+		User userToUpdate = buildUser(name, existingUser.getEmail(), roles);
+		userDao.updateUser(email, userToUpdate);
 		return userToUpdate;
 	}
 
@@ -62,6 +61,13 @@ public class UserServiceImpl implements UserService {
 		if (!StringUtils.hasText(email)) {
 			throw new IllegalArgumentException(ErrorMessages.EMAIL_REQUIRED);
 		}
+		if (roles == null || roles.isEmpty()) {
+			throw new IllegalArgumentException(ErrorMessages.ROLE_REQUIRED);
+		}
+	}
+
+	private void validateUpdateInput(String name, List<String> roles) {
+		validateName(name);
 		if (roles == null || roles.isEmpty()) {
 			throw new IllegalArgumentException(ErrorMessages.ROLE_REQUIRED);
 		}

@@ -71,7 +71,7 @@ class UserServiceImplTest {
 		UserNotFoundException exception =
 				assertThrows(
 						UserNotFoundException.class,
-						() -> userService.updateUser("missing@example.com", "Missing", "missing@example.com", List.of("admin")));
+						() -> userService.updateUser("missing@example.com", "Missing", List.of("admin")));
 
 		assertEquals("User not found", exception.getMessage());
 	}
@@ -87,16 +87,14 @@ class UserServiceImplTest {
 	}
 
 	@Test
-	void updateUser_shouldRejectDuplicateEmail() {
+	void updateUser_shouldKeepExistingEmail() {
 		UserServiceImpl userService = new UserServiceImpl(new UserDaoImpl());
 		userService.createUser(TEST_USER_NAME, TEST_USER_EMAIL, TEST_USER_ROLES);
-		userService.createUser("Bob", "bob@example.com", List.of("user"));
 
-		DuplicateEmailException exception =
-				assertThrows(
-						DuplicateEmailException.class,
-						() -> userService.updateUser("bob@example.com", "Bob", TEST_USER_EMAIL, List.of("user")));
+		User updatedUser = userService.updateUser(TEST_USER_EMAIL, "Updated Name", List.of("user"));
 
-		assertEquals("A user with this email already exists", exception.getMessage());
+		assertThat(updatedUser.getName()).isEqualTo("Updated Name");
+		assertThat(updatedUser.getEmail()).isEqualTo(TEST_USER_EMAIL);
+		assertThat(updatedUser.getRoles()).containsExactly("user");
 	}
 }

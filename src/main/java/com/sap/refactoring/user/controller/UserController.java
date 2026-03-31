@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sap.refactoring.common.CommonConstants;
+import com.sap.refactoring.user.dto.UpdateUserRequest;
 import com.sap.refactoring.user.dto.UserRequest;
 import com.sap.refactoring.user.dto.UserResponse;
 import com.sap.refactoring.user.model.User;
@@ -40,9 +41,8 @@ public class UserController {
 
 	@PutMapping(CommonConstants.EMAIL_PATH)
 	public ResponseEntity<UserResponse> updateUser(
-			@PathVariable String email, @Valid @RequestBody UserRequest request) {
-		User user = userService.updateUser(
-				email, request.getName(), request.getEmail(), request.getRoles());
+			@PathVariable String email, @Valid @RequestBody UpdateUserRequest request) {
+		User user = userService.updateUser(email, request.getName(), request.getRoles());
 		return ResponseEntity.ok(toUserResponse(user));
 	}
 

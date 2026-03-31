@@ -124,10 +124,10 @@ class UserIntegrationTest {
 		mockMvc.perform(
 						put("/users/" + TEST_USER_EMAIL)
 								.contentType(MediaType.APPLICATION_JSON)
-								.content(userRequestJson(TEST_USER_NAME, "updated@example.com", "user")))
+								.content(updateUserRequestJson(TEST_USER_NAME, "user")))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.name").value(TEST_USER_NAME))
-				.andExpect(jsonPath("$.email").value("updated@example.com"))
+				.andExpect(jsonPath("$.email").value(TEST_USER_EMAIL))
 				.andExpect(jsonPath("$.roles[0]").value("user"));
 	}
 
@@ -139,5 +139,14 @@ class UserIntegrationTest {
 				  "roles": ["%s"]
 				}
 				""".formatted(name, email, role);
+	}
+
+	private String updateUserRequestJson(String name, String role) {
+		return """
+				{
+				  "name": "%s",
+				  "roles": ["%s"]
+				}
+				""".formatted(name, role);
 	}
 }
