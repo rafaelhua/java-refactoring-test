@@ -7,11 +7,11 @@ import com.sap.refactoring.user.model.User;
 public interface UserService {
 	User createUser(String name, String email, List<String> roles);
 
-	User updateUser(String name, String email, List<String> roles);
+	User updateUser(String currentEmail, String name, String email, List<String> roles);
 
-	void deleteUser(String name);
+	void deleteUser(String email);
 
 	List<User> getUsers();
 
-	User findUser(String name);
+	User findUser(String email);
 }

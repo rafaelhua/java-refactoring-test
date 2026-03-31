@@ -9,9 +9,11 @@ public interface UserDao {
 
 	List<User> getUsers();
 
-	void deleteUser(User userToDelete);
+	void deleteUser(String email);
 
-	void updateUser(User userToUpdate);
+	void updateUser(String currentEmail, User userToUpdate);
 
-	User findUser(String name);
+	User findUser(String email);
+
+	void clearUsers();
 }

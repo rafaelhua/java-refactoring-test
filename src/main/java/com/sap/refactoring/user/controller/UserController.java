@@ -3,10 +3,15 @@ package com.sap.refactoring.user.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sap.refactoring.user.dto.UserRequest;
@@ -23,45 +28,35 @@ public class UserController {
 		this.userService = userService;
 	}
 
-	@GetMapping("add/")
-	public ResponseEntity<UserResponse> addUser(
-			@RequestParam("name") String name,
-			@RequestParam("email") String email,
-			@RequestParam("role") List<String> roles) {
-		UserRequest request = new UserRequest(name, email, roles);
+	@PostMapping
+	public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
 		User user = userService.createUser(
 				request.getName(), request.getEmail(), request.getRoles());
-		return ResponseEntity.ok(toUserResponse(user));
+		return ResponseEntity.status(HttpStatus.CREATED).body(toUserResponse(user));
 	}
 
-	@GetMapping("update/")
+	@PutMapping("/{email}")
 	public ResponseEntity<UserResponse> updateUser(
-			@RequestParam("name") String name,
-			@RequestParam("email") String email,
-			@RequestParam("role") List<String> roles) {
-		UserRequest request = new UserRequest(name, email, roles);
+			@PathVariable String email, @RequestBody UserRequest request) {
 		User user = userService.updateUser(
-				request.getName(), request.getEmail(), request.getRoles());
+				email, request.getName(), request.getEmail(), request.getRoles());
 		return ResponseEntity.ok(toUserResponse(user));
 	}
 
-	@GetMapping("delete/")
-	public ResponseEntity<Void> deleteUser(
-			@RequestParam("name") String name,
-			@RequestParam("email") String email,
-			@RequestParam("role") List<String> roles) {
-		userService.deleteUser(name);
-		return ResponseEntity.ok().build();
+	@DeleteMapping("/{email}")
+	public ResponseEntity<Void> deleteUser(@PathVariable String email) {
+		userService.deleteUser(email);
+		return ResponseEntity.noContent().build();
 	}
 
-	@GetMapping("find/")
+	@GetMapping
 	public ResponseEntity<List<UserResponse>> getUsers() {
 		return ResponseEntity.ok(toUserResponses(userService.getUsers()));
 	}
 
-	@GetMapping("search/")
-	public ResponseEntity<UserResponse> findUser(@RequestParam("name") String name) {
-		return ResponseEntity.ok(toUserResponse(userService.findUser(name)));
+	@GetMapping("/{email}")
+	public ResponseEntity<UserResponse> findUser(@PathVariable String email) {
+		return ResponseEntity.ok(toUserResponse(userService.findUser(email)));
 	}
 
 	private UserResponse toUserResponse(User user) {
