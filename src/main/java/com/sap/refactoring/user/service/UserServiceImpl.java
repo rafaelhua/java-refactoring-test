@@ -2,19 +2,16 @@ package com.sap.refactoring.user.service;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.sap.refactoring.user.dao.UserDao;
-import com.sap.refactoring.user.dao.UserDaoImpl;
-import com.sap.refactoring.user.exception.DuplicateEmailException;
 import com.sap.refactoring.user.exception.ErrorMessages;
 import com.sap.refactoring.user.exception.UserNotFoundException;
 import com.sap.refactoring.user.model.User;
 
+@Service
 public class UserServiceImpl implements UserService {
 	private final UserDao userDao;
-
-	public UserServiceImpl() {
-		this(new UserDaoImpl());
-	}
 
 	public UserServiceImpl(UserDao userDao) {
 		this.userDao = userDao;

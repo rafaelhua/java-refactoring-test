@@ -5,10 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.stereotype.Repository;
+
 import com.sap.refactoring.user.exception.DuplicateEmailException;
 import com.sap.refactoring.user.exception.ErrorMessages;
 import com.sap.refactoring.user.model.User;
 
+@Repository
 public class UserDaoImpl implements UserDao {
 	private final Map<String, User> users = new HashMap<>();
 
