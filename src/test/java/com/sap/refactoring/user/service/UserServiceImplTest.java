@@ -2,9 +2,13 @@ package com.sap.refactoring.user.service;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.sap.refactoring.user.dao.UserDaoImpl;
+import com.sap.refactoring.user.dao.UserDao;
 import com.sap.refactoring.user.exception.DuplicateEmailException;
 import com.sap.refactoring.user.exception.UserNotFoundException;
 import com.sap.refactoring.user.model.User;
@@ -12,15 +16,31 @@ import com.sap.refactoring.user.model.User;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 	private static final String TEST_USER_NAME = "Alice";
 	private static final String TEST_USER_EMAIL = "alice@example.com";
 	private static final List<String> TEST_USER_ROLES = List.of("admin");
 
+	@Mock
+	private UserDao userDao;
+
+	private UserServiceImpl userService;
+
+	@BeforeEach
+	void setUp() {
+		userService = new UserServiceImpl(userDao);
+	}
+
 	@Test
 	void createUser_shouldSaveAndReturnUser() {
-		UserServiceImpl userService = new UserServiceImpl(new UserDaoImpl());
+		User savedUser = new User(TEST_USER_NAME, TEST_USER_EMAIL, TEST_USER_ROLES);
+
+		when(userDao.saveUser(any(User.class))).thenReturn(savedUser);
 
 		User createdUser = userService.createUser(TEST_USER_NAME, TEST_USER_EMAIL, TEST_USER_ROLES);
 
@@ -31,8 +51,9 @@ class UserServiceImplTest {
 
 	@Test
 	void createUser_shouldRejectDuplicateEmail() {
-		UserServiceImpl userService = new UserServiceImpl(new UserDaoImpl());
-		userService.createUser(TEST_USER_NAME, TEST_USER_EMAIL, TEST_USER_ROLES);
+		doThrow(new DuplicateEmailException("A user with this email already exists"))
+				.when(userDao)
+				.saveUser(any(User.class));
 
 		DuplicateEmailException exception =
 				assertThrows(
@@ -44,7 +65,7 @@ class UserServiceImplTest {
 
 	@Test
 	void findUser_shouldThrowWhenUserDoesNotExist() {
-		UserServiceImpl userService = new UserServiceImpl(new UserDaoImpl());
+		when(userDao.findUser("missing@example.com")).thenReturn(null);
 
 		UserNotFoundException exception =
 				assertThrows(UserNotFoundException.class, () -> userService.findUser("missing@example.com"));
@@ -54,8 +75,6 @@ class UserServiceImplTest {
 
 	@Test
 	void createUser_shouldRejectBlankName() {
-		UserServiceImpl userService = new UserServiceImpl(new UserDaoImpl());
-
 		IllegalArgumentException exception =
 				assertThrows(
 						IllegalArgumentException.class,
@@ -66,7 +85,7 @@ class UserServiceImplTest {
 
 	@Test
 	void updateUser_shouldThrowWhenUserDoesNotExist() {
-		UserServiceImpl userService = new UserServiceImpl(new UserDaoImpl());
+		when(userDao.findUser("missing@example.com")).thenReturn(null);
 
 		UserNotFoundException exception =
 				assertThrows(
@@ -78,7 +97,7 @@ class UserServiceImplTest {
 
 	@Test
 	void deleteUser_shouldThrowWhenUserDoesNotExist() {
-		UserServiceImpl userService = new UserServiceImpl(new UserDaoImpl());
+		when(userDao.findUser("missing@example.com")).thenReturn(null);
 
 		UserNotFoundException exception =
 				assertThrows(UserNotFoundException.class, () -> userService.deleteUser("missing@example.com"));
@@ -88,8 +107,7 @@ class UserServiceImplTest {
 
 	@Test
 	void updateUser_shouldKeepExistingEmail() {
-		UserServiceImpl userService = new UserServiceImpl(new UserDaoImpl());
-		userService.createUser(TEST_USER_NAME, TEST_USER_EMAIL, TEST_USER_ROLES);
+		when(userDao.findUser(TEST_USER_EMAIL)).thenReturn(new User(TEST_USER_NAME, TEST_USER_EMAIL, TEST_USER_ROLES));
 
 		User updatedUser = userService.updateUser(TEST_USER_EMAIL, "Updated Name", List.of("user"));
 

@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.sap.refactoring.common.CommonConstants;
 import com.sap.refactoring.user.exception.ErrorMessages;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -32,7 +33,8 @@ class UserIntegrationTest {
 	@Test
 	void createUser_shouldReturnUserResponse() throws Exception {
 		mockMvc.perform(
-						post("/users")
+						post(CommonConstants.API_CONTEXT_PATH + CommonConstants.USERS_PATH)
+								.contextPath(CommonConstants.API_CONTEXT_PATH)
 								.contentType(MediaType.APPLICATION_JSON)
 								.content(userRequestJson(TEST_USER_NAME, TEST_USER_EMAIL, TEST_USER_ROLE)))
 				.andExpect(status().isCreated())
@@ -44,13 +46,15 @@ class UserIntegrationTest {
 	@Test
 	void createUser_shouldReturnConflictForDuplicateEmail() throws Exception {
 		mockMvc.perform(
-						post("/users")
+						post(CommonConstants.API_CONTEXT_PATH + CommonConstants.USERS_PATH)
+								.contextPath(CommonConstants.API_CONTEXT_PATH)
 								.contentType(MediaType.APPLICATION_JSON)
 								.content(userRequestJson(TEST_USER_NAME, "duplicate@example.com", TEST_USER_ROLE)))
 				.andExpect(status().isCreated());
 
 		mockMvc.perform(
-						post("/users")
+						post(CommonConstants.API_CONTEXT_PATH + CommonConstants.USERS_PATH)
+								.contextPath(CommonConstants.API_CONTEXT_PATH)
 								.contentType(MediaType.APPLICATION_JSON)
 								.content(userRequestJson("Bob", "duplicate@example.com", "user")))
 				.andExpect(status().isConflict())
@@ -59,7 +63,9 @@ class UserIntegrationTest {
 
 	@Test
 	void searchUser_shouldReturnNotFoundForMissingUser() throws Exception {
-		mockMvc.perform(get("/users/missing@example.com"))
+		mockMvc.perform(
+						get(CommonConstants.API_CONTEXT_PATH + CommonConstants.USERS_PATH + "/missing@example.com")
+								.contextPath(CommonConstants.API_CONTEXT_PATH))
 				.andExpect(status().isNotFound())
 				.andExpect(content().string(ErrorMessages.USER_NOT_FOUND));
 	}
@@ -67,12 +73,15 @@ class UserIntegrationTest {
 	@Test
 	void searchUser_shouldReturnUserResponseWhenUserExists() throws Exception {
 		mockMvc.perform(
-						post("/users")
+						post(CommonConstants.API_CONTEXT_PATH + CommonConstants.USERS_PATH)
+								.contextPath(CommonConstants.API_CONTEXT_PATH)
 								.contentType(MediaType.APPLICATION_JSON)
 								.content(userRequestJson("Carol", "carol@example.com", "user")))
 				.andExpect(status().isCreated());
 
-		mockMvc.perform(get("/users/carol@example.com"))
+		mockMvc.perform(
+						get(CommonConstants.API_CONTEXT_PATH + CommonConstants.USERS_PATH + "/carol@example.com")
+								.contextPath(CommonConstants.API_CONTEXT_PATH))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.name").value("Carol"))
 				.andExpect(jsonPath("$.email").value("carol@example.com"))
@@ -82,12 +91,15 @@ class UserIntegrationTest {
 	@Test
 	void findUsers_shouldReturnSavedUsers() throws Exception {
 		mockMvc.perform(
-						post("/users")
+						post(CommonConstants.API_CONTEXT_PATH + CommonConstants.USERS_PATH)
+								.contextPath(CommonConstants.API_CONTEXT_PATH)
 								.contentType(MediaType.APPLICATION_JSON)
 								.content(userRequestJson("Dave", "dave@example.com", TEST_USER_ROLE)))
 				.andExpect(status().isCreated());
 
-		mockMvc.perform(get("/users"))
+		mockMvc.perform(
+						get(CommonConstants.API_CONTEXT_PATH + CommonConstants.USERS_PATH)
+								.contextPath(CommonConstants.API_CONTEXT_PATH))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].name").exists());
 	}
@@ -95,7 +107,8 @@ class UserIntegrationTest {
 	@Test
 	void createUser_shouldReturnBadRequestForBlankName() throws Exception {
 		mockMvc.perform(
-						post("/users")
+						post(CommonConstants.API_CONTEXT_PATH + CommonConstants.USERS_PATH)
+								.contextPath(CommonConstants.API_CONTEXT_PATH)
 								.contentType(MediaType.APPLICATION_JSON)
 								.content(userRequestJson("", "bad@example.com", TEST_USER_ROLE)))
 				.andExpect(status().isBadRequest())
@@ -105,24 +118,30 @@ class UserIntegrationTest {
 	@Test
 	void deleteUser_shouldReturnOkWhenUserExists() throws Exception {
 		mockMvc.perform(
-						post("/users")
+						post(CommonConstants.API_CONTEXT_PATH + CommonConstants.USERS_PATH)
+								.contextPath(CommonConstants.API_CONTEXT_PATH)
 								.contentType(MediaType.APPLICATION_JSON)
 								.content(userRequestJson("Eve", "eve@example.com", "user")))
 				.andExpect(status().isCreated());
 
-		mockMvc.perform(delete("/users/eve@example.com")).andExpect(status().isNoContent());
+		mockMvc.perform(
+						delete(CommonConstants.API_CONTEXT_PATH + CommonConstants.USERS_PATH + "/eve@example.com")
+								.contextPath(CommonConstants.API_CONTEXT_PATH))
+				.andExpect(status().isNoContent());
 	}
 
 	@Test
 	void updateUser_shouldReturnUpdatedUserResponse() throws Exception {
 		mockMvc.perform(
-						post("/users")
+						post(CommonConstants.API_CONTEXT_PATH + CommonConstants.USERS_PATH)
+								.contextPath(CommonConstants.API_CONTEXT_PATH)
 								.contentType(MediaType.APPLICATION_JSON)
 								.content(userRequestJson(TEST_USER_NAME, TEST_USER_EMAIL, TEST_USER_ROLE)))
 				.andExpect(status().isCreated());
 
 		mockMvc.perform(
-						put("/users/" + TEST_USER_EMAIL)
+						put(CommonConstants.API_CONTEXT_PATH + CommonConstants.USERS_PATH + "/" + TEST_USER_EMAIL)
+								.contextPath(CommonConstants.API_CONTEXT_PATH)
 								.contentType(MediaType.APPLICATION_JSON)
 								.content(updateUserRequestJson(TEST_USER_NAME, "user")))
 				.andExpect(status().isOk())

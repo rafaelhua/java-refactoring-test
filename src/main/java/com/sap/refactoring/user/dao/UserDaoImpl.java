@@ -1,9 +1,9 @@
 package com.sap.refactoring.user.dao;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -14,7 +14,7 @@ import com.sap.refactoring.user.model.User;
 
 @Repository
 public class UserDaoImpl implements UserDao {
-	private final Map<String, User> users = new HashMap<>();
+	private final Map<String, User> users = new ConcurrentHashMap<>();
 
 	@Override
 	public synchronized User saveUser(User user) {
@@ -31,12 +31,12 @@ public class UserDaoImpl implements UserDao {
 	}
 
 	@Override
-	public synchronized List<User> getUsers() {
+	public List<User> getUsers() {
 		return new ArrayList<>(users.values());
 	}
 
 	@Override
-	public synchronized void deleteUser(String email) {
+	public void deleteUser(String email) {
 		if (!StringUtils.hasText(email)) {
 			return;
 		}
@@ -62,7 +62,7 @@ public class UserDaoImpl implements UserDao {
 	}
 
 	@Override
-	public synchronized User findUser(String email) {
+	public User findUser(String email) {
 		if (!StringUtils.hasText(email)) {
 			return null;
 		}
