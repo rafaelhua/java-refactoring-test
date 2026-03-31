@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import com.sap.refactoring.user.exception.DuplicateEmailException;
 import com.sap.refactoring.user.exception.ErrorMessages;
@@ -17,7 +18,7 @@ public class UserDaoImpl implements UserDao {
 
 	@Override
 	public synchronized void saveUser(User user) {
-		if (user == null || user.getEmail() == null) {
+		if (user == null || !StringUtils.hasText(user.getEmail())) {
 			return;
 		}
 
@@ -35,7 +36,7 @@ public class UserDaoImpl implements UserDao {
 
 	@Override
 	public synchronized void deleteUser(String email) {
-		if (email == null) {
+		if (!StringUtils.hasText(email)) {
 			return;
 		}
 
@@ -44,7 +45,9 @@ public class UserDaoImpl implements UserDao {
 
 	@Override
 	public synchronized void updateUser(String currentEmail, User userToUpdate) {
-		if (currentEmail == null || userToUpdate == null || userToUpdate.getEmail() == null) {
+		if (!StringUtils.hasText(currentEmail)
+				|| userToUpdate == null
+				|| !StringUtils.hasText(userToUpdate.getEmail())) {
 			return;
 		}
 
@@ -64,15 +67,10 @@ public class UserDaoImpl implements UserDao {
 
 	@Override
 	public synchronized User findUser(String email) {
-		if (email == null) {
+		if (!StringUtils.hasText(email)) {
 			return null;
 		}
 
 		return users.get(email);
-	}
-
-	@Override
-	public synchronized void clearUsers() {
-		users.clear();
 	}
 }

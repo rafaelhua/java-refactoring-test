@@ -1,14 +1,13 @@
 package com.sap.refactoring.user.integration;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.sap.refactoring.user.dao.UserDao;
 import com.sap.refactoring.user.exception.ErrorMessages;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -21,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class UserIntegrationTest {
 	private static final String TEST_USER_NAME = "Alice";
 	private static final String TEST_USER_EMAIL = "alice@example.com";
@@ -28,14 +28,6 @@ class UserIntegrationTest {
 
 	@Autowired
 	private MockMvc mockMvc;
-
-	@Autowired
-	private UserDao userDao;
-
-	@BeforeEach
-	void clearUsers() {
-		userDao.clearUsers();
-	}
 
 	@Test
 	void createUser_shouldReturnUserResponse() throws Exception {

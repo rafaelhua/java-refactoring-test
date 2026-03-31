@@ -3,6 +3,7 @@ package com.sap.refactoring.user.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.sap.refactoring.user.dao.UserDao;
 import com.sap.refactoring.user.exception.ErrorMessages;
@@ -58,7 +59,7 @@ public class UserServiceImpl implements UserService {
 
 	private void validateUserInput(String name, String email, List<String> roles) {
 		validateName(name);
-		if (email == null || email.isBlank()) {
+		if (!StringUtils.hasText(email)) {
 			throw new IllegalArgumentException(ErrorMessages.EMAIL_REQUIRED);
 		}
 		if (roles == null || roles.isEmpty()) {
@@ -78,13 +79,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	private void validateLookupEmail(String email) {
-		if (email == null || email.isBlank()) {
+		if (!StringUtils.hasText(email)) {
 			throw new IllegalArgumentException(ErrorMessages.EMAIL_REQUIRED);
 		}
 	}
 
 	private void validateName(String name) {
-		if (name == null || name.isBlank()) {
+		if (!StringUtils.hasText(name)) {
 			throw new IllegalArgumentException(ErrorMessages.NAME_REQUIRED);
 		}
 	}

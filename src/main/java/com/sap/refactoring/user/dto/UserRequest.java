@@ -3,9 +3,17 @@ package com.sap.refactoring.user.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+
 public class UserRequest {
+	@NotBlank(message = "Name must not be blank")
 	private String name;
+
+	@NotBlank(message = "Email must not be blank")
 	private String email;
+
+	@NotEmpty(message = "User must have at least one role")
 	private List<String> roles = new ArrayList<>();
 
 	public UserRequest() {}

@@ -3,6 +3,8 @@ package com.sap.refactoring.user.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,13 +16,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sap.refactoring.common.CommonConstants;
 import com.sap.refactoring.user.dto.UserRequest;
 import com.sap.refactoring.user.dto.UserResponse;
 import com.sap.refactoring.user.model.User;
 import com.sap.refactoring.user.service.UserService;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping(CommonConstants.USERS_PATH)
 public class UserController {
 	private final UserService userService;
 
@@ -29,21 +32,21 @@ public class UserController {
 	}
 
 	@PostMapping
-	public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
+	public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request) {
 		User user = userService.createUser(
 				request.getName(), request.getEmail(), request.getRoles());
 		return ResponseEntity.status(HttpStatus.CREATED).body(toUserResponse(user));
 	}
 
-	@PutMapping("/{email}")
+	@PutMapping(CommonConstants.EMAIL_PATH)
 	public ResponseEntity<UserResponse> updateUser(
-			@PathVariable String email, @RequestBody UserRequest request) {
+			@PathVariable String email, @Valid @RequestBody UserRequest request) {
 		User user = userService.updateUser(
 				email, request.getName(), request.getEmail(), request.getRoles());
 		return ResponseEntity.ok(toUserResponse(user));
 	}
 
-	@DeleteMapping("/{email}")
+	@DeleteMapping(CommonConstants.EMAIL_PATH)
 	public ResponseEntity<Void> deleteUser(@PathVariable String email) {
 		userService.deleteUser(email);
 		return ResponseEntity.noContent().build();
@@ -54,7 +57,7 @@ public class UserController {
 		return ResponseEntity.ok(toUserResponses(userService.getUsers()));
 	}
 
-	@GetMapping("/{email}")
+	@GetMapping(CommonConstants.EMAIL_PATH)
 	public ResponseEntity<UserResponse> findUser(@PathVariable String email) {
 		return ResponseEntity.ok(toUserResponse(userService.findUser(email)));
 	}

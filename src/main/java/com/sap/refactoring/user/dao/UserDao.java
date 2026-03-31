@@ -14,6 +14,4 @@ public interface UserDao {
 	void updateUser(String currentEmail, User userToUpdate);
 
 	User findUser(String email);
-
-	void clearUsers();
 }
